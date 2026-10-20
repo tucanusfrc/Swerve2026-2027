@@ -1,0 +1,8 @@
+tem que testar algumas relações empiricamente pra fazer funcionar
+
+1. Converter de tensão e percent em metros por segundo.
+    Esse aqui temos que testar e encontrar uma constante
+    nosso teste vai ser comparando rotações por segundo e aplicnado a constante de circunferência.
+    Vamos testar com o robô suspenso
+
+2. Converter a velocidade angular no pigeon para radianos por segundo
