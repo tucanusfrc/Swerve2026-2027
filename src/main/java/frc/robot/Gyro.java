@@ -9,7 +9,7 @@ public class Gyro {
     private Pigeon2 pigeon2;
 
     public Gyro(){
-        pigeon2 = new Pigeon2(4);
+        pigeon2 = new Pigeon2(0);
     }
 
     public Rotation2d getYawAsRotation2d(){

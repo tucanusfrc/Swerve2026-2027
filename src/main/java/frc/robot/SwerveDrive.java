@@ -6,6 +6,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SwerveDrive {
 
@@ -45,10 +46,10 @@ public class SwerveDrive {
 	
 	private ChassisSpeeds runChassisSpeed(XboxController controller, Rotation2d angle){
 		return ChassisSpeeds.fromFieldRelativeSpeeds(
-				toMetersPerSecond(controller.getLeftY()),
-				toMetersPerSecond(controller.getLeftX()),
-				toRadiansPerSecond(controller.getRightX()), 
-				angle);
+			controlleDeadband(controller.getLeftY()),
+			controlleDeadband(controller.getLeftX()),
+			controlleDeadband(controller.getRightX()),
+			angle);
 	}
 
     private SwerveModuleState[] runSwerveModuleStates(ChassisSpeeds speed){
@@ -62,13 +63,21 @@ public class SwerveDrive {
 		backLeftModule.setDesiredState(states[3]);
 	}
 
-	private double toMetersPerSecond (double x){
-		return 0;
-		// return x * Constants.SwerveDrive.PERCENT_METERS_PER_SECOND_CONVERSOR;
-	}
+	// private double toMetersPerSecond (double x){
+	// 	return 0;
+	// 	// return x * Constants.SwerveDrive.PERCENT_METERS_PER_SECOND_CONVERSOR;
+	// }
 	
-	private double toRadiansPerSecond (double x){
-		return x * 10;
+	// private double toRadiansPerSecond (double x){
+	// 	return x * 10;
+	// }
+
+	private double controlleDeadband(double value){
+		if(Math.abs(value) > Constants.SwerveDrive.CONTROLLER_DEAD_BAND){
+			return value;
+		} else{
+			return 0;
+		}
 	}
     
 	public void run(){
@@ -79,4 +88,31 @@ public class SwerveDrive {
 		);
 	}
 	
+	public void printOdometry(){
+		SwerveModuleState state[] = runSwerveModuleStates(runChassisSpeed(controll, gyro.getYawAsRotation2d()));
+
+		SmartDashboard.putNumber("leftFrontSpeed", state[0].speedMetersPerSecond);
+		SmartDashboard.putNumber("leftFrontTurn", state[0].angle.getDegrees());
+
+		SmartDashboard.putNumber("rightFrontSpeed", state[1].speedMetersPerSecond);
+		SmartDashboard.putNumber("rightFrontTurn", state[1].angle.getDegrees());
+
+		SmartDashboard.putNumber("rightBackSpeed", state[2].speedMetersPerSecond);
+		SmartDashboard.putNumber("rightBackTurn", state[2].angle.getDegrees());
+
+		SmartDashboard.putNumber("leftBackSpeed", state[3].speedMetersPerSecond);
+		SmartDashboard.putNumber("leftBackTurn", state[3].angle.getDegrees());
+		
+		SmartDashboard.putNumber("leftFrontTurn", state[3].angle.getDegrees());
+
+		SmartDashboard.putNumber("leftFrontTurnEncoder", frontLeftModule.getDoubleAngle());
+		SmartDashboard.putNumber("rightFrontTurnEncoder", frontRightModule.getDoubleAngle());
+		SmartDashboard.putNumber("rightBackTurnEncoder", backRightModule.getDoubleAngle());
+		SmartDashboard.putNumber("leftBackTurnEncoder", backLeftModule.getDoubleAngle());
+
+
+
+
+	}
+
 }

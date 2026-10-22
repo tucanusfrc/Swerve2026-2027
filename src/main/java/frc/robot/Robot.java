@@ -4,20 +4,12 @@
 
 package frc.robot;
 
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
-
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.XboxController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class Robot extends TimedRobot {
 
   XboxController controller = new XboxController(0);
-
-  private Gyro gyro = new Gyro();
 
   private final int SpeedIds[] = {
     Constants.SwerveDrive.FRONT_LEFT_SPEED_ID,
@@ -40,14 +32,8 @@ public class Robot extends TimedRobot {
     Constants.SwerveDrive.BACK_LEFT_ENCODER_ID
   };
 
-
-  // SwerveDrive drive = new SwerveDrive(controller, SpeedIds, TurnIds, AbsEncoderIds, gyro);
-
-  SparkMax speed = new SparkMax(1, MotorType.kBrushless);
-  RelativeEncoder speed_encoder = speed.getEncoder();
-  
-  SparkMax turn = new SparkMax(2, MotorType.kBrushless);
-  RelativeEncoder turn_encoder = turn.getEncoder();
+  Gyro gyro = new Gyro();
+  SwerveDrive drive = new SwerveDrive(controller, SpeedIds, TurnIds, AbsEncoderIds, gyro);
 
   XboxController m_Controller = new XboxController(0);
 
@@ -57,7 +43,9 @@ public class Robot extends TimedRobot {
   }
   
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    drive.printOdometry();
+  }
   
   @Override
   public void autonomousInit() {}
@@ -67,8 +55,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    speed_encoder.setPosition(0);
-    turn_encoder.setPosition(0);
+    
 
   }
   
@@ -77,13 +64,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic() {
-    // spark.set(controller.getLeftY());
-    double RPM = speed_encoder.getVelocity();
-    double MPS = ((RPM / 60) / 6.75) * 0.285;
-    speed.set(m_Controller.getLeftY());
-
-    SmartDashboard.putNumber("conta_da_swerve_mps", MPS);
-    
+    drive.run();
   }
 
   @Override

@@ -35,7 +35,7 @@ public class Constants {
         public static final Translation2d BACK_RIGHT_POSITION = new Translation2d(0.3, -0.3); // VERIFICADO
         public static final Translation2d BACK_LEFT_POSITION = new Translation2d(-0.3, -0.3); // VERIFICADO
 
-        
+        public static final double CONTROLLER_DEAD_BAND = 0.05; //VERIFICADO
     }
 
 }   

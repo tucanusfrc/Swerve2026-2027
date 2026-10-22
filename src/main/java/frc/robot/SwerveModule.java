@@ -36,8 +36,8 @@ public class SwerveModule {
         
         this.encoderOffset = encoderOffset;
         
-        c_Speed.inverted(false).closedLoop.p(0).i(0).d(0);
-        c_Turn.inverted(false).closedLoop.p(0).i(0).d(0);
+        c_Speed.inverted(false);
+        c_Turn.inverted(false).closedLoop.p(0.5).i(0).d(0);
         
         
         m_Speed.configure(
@@ -59,7 +59,7 @@ public class SwerveModule {
         
         Rotation2d currentAngle = getAngle();
         
-        desiredState.optimize(currentAngle);
+        // desiredState.optimize(currentAngle);
         
         setDriveSpeed(desiredState.speedMetersPerSecond);
         setAngle(desiredState.angle);
@@ -67,11 +67,14 @@ public class SwerveModule {
     }
     
     public void setDriveSpeed(double speed_mps){
-        m_Speed.set(speed_mps);
+        m_Speed.set(0);
     }
     
     public void setAngle(Rotation2d angle){
-        controller.setSetpoint(angle.getRotations(), ControlType.kPosition);
+        controller.setSetpoint(
+            (angle.getRotations() * (150/7)), 
+            ControlType.kPosition
+        );
     }
     
     private double NomalizeMetersPerSeconds(double mps){
@@ -80,7 +83,11 @@ public class SwerveModule {
     }
     
     public Rotation2d getAngle(){
-        return Rotation2d.fromRotations(turnEncoder.getPosition().getValueAsDouble() - encoderOffset);
+        return turnEncoder.getPosition();
+    }
+
+    public double getDoubleAngle(){
+        return turnEncoder.getPosition().getValueAsDouble() - encoderOffset;
     }
     
     private double lastPosition = 0;
