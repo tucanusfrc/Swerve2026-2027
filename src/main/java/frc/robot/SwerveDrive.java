@@ -14,26 +14,26 @@ public class SwerveDrive {
 
     private Gyro gyro;
 
-	private SwerveModule frontLeftModule;
-	private SwerveModule frontRightModule;
-	private SwerveModule backRightModule;
-	private SwerveModule backLeftModule;
+	private SwerveModule leftFrontModule;
+	private SwerveModule rightFrontModule;
+	private SwerveModule rightBackModule;
+	private SwerveModule leftBackModule;
 	
     public SwerveDrive (XboxController controll, int SpeedIds[], int TurnIds[], int AbsEncoderIds[], Gyro gyro){
 		this.controll = controll;
 		this.gyro = gyro;
 
-		frontLeftModule = new SwerveModule(SpeedIds[0], TurnIds[0], AbsEncoderIds[0], 0);
-		frontRightModule = new SwerveModule(SpeedIds[1], TurnIds[1], AbsEncoderIds[1], 1);
-		backRightModule = new SwerveModule(SpeedIds[2], TurnIds[2], AbsEncoderIds[2], 2);
-		backLeftModule = new SwerveModule(SpeedIds[3], TurnIds[3], AbsEncoderIds[3], 3);
+		leftFrontModule = new SwerveModule(SpeedIds[1], TurnIds[1], AbsEncoderIds[1], 0);
+		rightFrontModule = new SwerveModule(SpeedIds[0], TurnIds[0], AbsEncoderIds[0], 0);
+		rightBackModule = new SwerveModule(SpeedIds[2], TurnIds[2], AbsEncoderIds[2], 0);
+		leftBackModule = new SwerveModule(SpeedIds[3], TurnIds[3], AbsEncoderIds[3], 0);
 		
 	}
 	
-    private final Translation2d leftFrontPosition = new Translation2d(10, 20);
-    private final Translation2d rightFrontPosition = new Translation2d(10, 20);
-    private final Translation2d leftBackPosition = new Translation2d(10, 20);
-    private final Translation2d rightBackPosition = new Translation2d(10, 20);
+    private final Translation2d leftFrontPosition = new Translation2d(-30, 30);
+    private final Translation2d rightFrontPosition = new Translation2d(30, 30);
+    private final Translation2d leftBackPosition = new Translation2d(30, -30);
+    private final Translation2d rightBackPosition = new Translation2d(-30, -30);
 
     private final SwerveDriveKinematics kinematics = 
                     new SwerveDriveKinematics(
@@ -57,10 +57,10 @@ public class SwerveDrive {
 	}
 
     private void setStates(SwerveModuleState states[]){
-		frontLeftModule.setDesiredState(states[0]);
-		frontRightModule.setDesiredState(states[1]);
-		backRightModule.setDesiredState(states[2]);
-		backLeftModule.setDesiredState(states[3]);
+		leftFrontModule.setDesiredState(states[0]);
+		rightFrontModule.setDesiredState(states[1]);
+		rightBackModule.setDesiredState(states[2]);
+		leftBackModule.setDesiredState(states[3]);
 	}
 
 	// private double toMetersPerSecond (double x){
@@ -92,27 +92,28 @@ public class SwerveDrive {
 		SwerveModuleState state[] = runSwerveModuleStates(runChassisSpeed(controll, gyro.getYawAsRotation2d()));
 
 		SmartDashboard.putNumber("leftFrontSpeed", state[0].speedMetersPerSecond);
-		SmartDashboard.putNumber("leftFrontTurn", state[0].angle.getDegrees());
+		SmartDashboard.putNumber("leftFrontTurn", state[0].angle.getRotations());
 
 		SmartDashboard.putNumber("rightFrontSpeed", state[1].speedMetersPerSecond);
-		SmartDashboard.putNumber("rightFrontTurn", state[1].angle.getDegrees());
+		SmartDashboard.putNumber("rightFrontTurn", state[1].angle.getRotations());
 
 		SmartDashboard.putNumber("rightBackSpeed", state[2].speedMetersPerSecond);
-		SmartDashboard.putNumber("rightBackTurn", state[2].angle.getDegrees());
+		SmartDashboard.putNumber("rightBackTurn", state[2].angle.getRotations());
 
 		SmartDashboard.putNumber("leftBackSpeed", state[3].speedMetersPerSecond);
-		SmartDashboard.putNumber("leftBackTurn", state[3].angle.getDegrees());
+		SmartDashboard.putNumber("leftBackTurn", state[3].angle.getRotations());
 		
-		SmartDashboard.putNumber("leftFrontTurn", state[3].angle.getDegrees());
+		SmartDashboard.putNumber("leftFrontTurnEncoder", leftFrontModule.getDoubleAngle());
+		SmartDashboard.putNumber("rightFrontTurnEncoder", rightFrontModule.getDoubleAngle());
+		SmartDashboard.putNumber("rightBackTurnEncoder", rightBackModule.getDoubleAngle());
+		SmartDashboard.putNumber("leftBackTurnEncoder", leftBackModule.getDoubleAngle());
+	}
 
-		SmartDashboard.putNumber("leftFrontTurnEncoder", frontLeftModule.getDoubleAngle());
-		SmartDashboard.putNumber("rightFrontTurnEncoder", frontRightModule.getDoubleAngle());
-		SmartDashboard.putNumber("rightBackTurnEncoder", backRightModule.getDoubleAngle());
-		SmartDashboard.putNumber("leftBackTurnEncoder", backLeftModule.getDoubleAngle());
-
-
-
-
+	public void setAllAnglesZero(){
+		leftFrontModule.setAngleZero();
+		leftBackModule.setAngleZero();
+		leftBackModule.setAngleZero();
+		rightFrontModule.setAngleZero();
 	}
 
 }

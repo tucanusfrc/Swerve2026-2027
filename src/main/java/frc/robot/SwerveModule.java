@@ -13,6 +13,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SwerveModule {
     
@@ -46,7 +47,7 @@ public class SwerveModule {
             PersistMode.kPersistParameters
             );
             
-            m_Speed.configure(
+        m_Speed.configure(
             c_Turn, 
             ResetMode.kResetSafeParameters,
             PersistMode.kPersistParameters
@@ -69,12 +70,26 @@ public class SwerveModule {
     public void setDriveSpeed(double speed_mps){
         m_Speed.set(0);
     }
+
+    private double turnCompenser = 0;
     
-    public void setAngle(Rotation2d angle){
+    public void setAngle(Rotation2d rawSetPoint){
+        double rest_CanCoder = getAngle().getRotations() % 1;
+
+        if(Math.abs(rawSetPoint.getRotations() - rest_CanCoder) > 0.5){
+            turnCompenser += rawSetPoint.getRotations() > rest_CanCoder ? -1 : 1;
+        }
+
+        double setPoint = rawSetPoint.getRotations() + turnCompenser;
+
         controller.setSetpoint(
-            (angle.getRotations() * (150/7)), 
+            (setPoint * (150/7)), 
             ControlType.kPosition
         );
+    }
+
+    public void setAngleZero(){
+        turnEncoder.setPosition(0);
     }
     
     private double NomalizeMetersPerSeconds(double mps){
@@ -83,7 +98,8 @@ public class SwerveModule {
     }
     
     public Rotation2d getAngle(){
-        return turnEncoder.getPosition();
+        double angle = turnEncoder.getPosition().getValueAsDouble();
+        return Rotation2d.fromDegrees(angle);
     }
 
     public double getDoubleAngle(){
