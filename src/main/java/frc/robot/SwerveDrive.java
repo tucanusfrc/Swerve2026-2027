@@ -23,24 +23,24 @@ public class SwerveDrive {
 		this.controll = controll;
 		this.gyro = gyro;
 
-		leftFrontModule = new SwerveModule(SpeedIds[1], TurnIds[1], AbsEncoderIds[1], 0);
-		rightFrontModule = new SwerveModule(SpeedIds[0], TurnIds[0], AbsEncoderIds[0], 0);
-		rightBackModule = new SwerveModule(SpeedIds[2], TurnIds[2], AbsEncoderIds[2], 0);
+		leftFrontModule = new SwerveModule(SpeedIds[0], TurnIds[0], AbsEncoderIds[0], 0);
+		rightFrontModule = new SwerveModule(SpeedIds[1], TurnIds[1], AbsEncoderIds[1], 0);
+		rightBackModule = new SwerveModule(SpeedIds[2], TurnIds[2], AbsEncoderIds[2], -0.094482);
 		leftBackModule = new SwerveModule(SpeedIds[3], TurnIds[3], AbsEncoderIds[3], 0);
 		
 	}
 	
-    private final Translation2d leftFrontPosition = new Translation2d(-30, 30);
-    private final Translation2d rightFrontPosition = new Translation2d(30, 30);
-    private final Translation2d leftBackPosition = new Translation2d(30, -30);
-    private final Translation2d rightBackPosition = new Translation2d(-30, -30);
+    private final Translation2d leftFrontPosition = new Translation2d(-0.3, 0.3);
+    private final Translation2d rightFrontPosition = new Translation2d(0.3, 0.3);
+    private final Translation2d rightBackPosition = new Translation2d(0.3, -0.3);
+    private final Translation2d leftBackPosition = new Translation2d(-0.3, -0.3);
 
     private final SwerveDriveKinematics kinematics = 
                     new SwerveDriveKinematics(
                         leftFrontPosition, 
                         rightFrontPosition,
-                        leftBackPosition,
-                        rightBackPosition
+                        rightBackPosition,
+                        leftBackPosition
                     );
 
 	
@@ -107,6 +107,11 @@ public class SwerveDrive {
 		SmartDashboard.putNumber("rightFrontTurnEncoder", rightFrontModule.getDoubleAngle());
 		SmartDashboard.putNumber("rightBackTurnEncoder", rightBackModule.getDoubleAngle());
 		SmartDashboard.putNumber("leftBackTurnEncoder", leftBackModule.getDoubleAngle());
+		
+		SmartDashboard.putNumber("leftFrontTurnNEOEncoder", leftFrontModule.getNeoAngle());
+		SmartDashboard.putNumber("rightFrontTurnNEOEncoder", rightFrontModule.getNeoAngle());
+		SmartDashboard.putNumber("rightBackTurnNEOEncoder", rightBackModule.getNeoAngle());
+		SmartDashboard.putNumber("leftBackTurnNEOEncoder", leftBackModule.getNeoAngle());
 	}
 
 	public void setAllAnglesZero(){

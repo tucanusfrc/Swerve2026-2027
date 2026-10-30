@@ -65,6 +65,9 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     drive.run();
+    if (controller.getAButton()){
+      drive.setAllAnglesZero();
+    }
   }
 
   @Override

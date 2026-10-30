@@ -13,17 +13,18 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SwerveModule {
     
     private final SparkMax m_Speed;
     private final SparkMax m_Turn;
-    private final RelativeEncoder speedEncoder;
+    private final RelativeEncoder neoSpeedEncoder;
+    private final RelativeEncoder neoTurnEncoder;
     private final CANcoder turnEncoder;
 
     private SparkMaxConfig c_Speed = new SparkMaxConfig();
     private SparkMaxConfig c_Turn = new SparkMaxConfig();
+
     SparkClosedLoopController controller;
         
     private final double encoderOffset;
@@ -33,12 +34,16 @@ public class SwerveModule {
         m_Turn = new SparkMax(turnId, MotorType.kBrushless);
         this.turnEncoder = new CANcoder(encoderId);
         
-        speedEncoder = m_Speed.getEncoder();
+        
+        neoSpeedEncoder = m_Speed.getEncoder();
+        neoTurnEncoder = m_Turn.getEncoder();
         
         this.encoderOffset = encoderOffset;
         
         c_Speed.inverted(false);
-        c_Turn.inverted(false).closedLoop.p(0.5).i(0).d(0);
+        c_Turn.inverted(false)
+        .encoder.positionConversionFactor(1);
+        c_Turn.closedLoop.p(0.5).i(0).d(0);
         
         
         m_Speed.configure(
@@ -60,7 +65,7 @@ public class SwerveModule {
         
         Rotation2d currentAngle = getAngle();
         
-        // desiredState.optimize(currentAngle);
+        desiredState.optimize(currentAngle);
         
         setDriveSpeed(desiredState.speedMetersPerSecond);
         setAngle(desiredState.angle);
@@ -83,17 +88,18 @@ public class SwerveModule {
         double setPoint = rawSetPoint.getRotations() + turnCompenser;
 
         controller.setSetpoint(
-            (setPoint * (150/7)), 
+            ((-setPoint + encoderOffset) * (150/7)), 
             ControlType.kPosition
         );
     }
 
     public void setAngleZero(){
         turnEncoder.setPosition(0);
+        neoTurnEncoder.setPosition(0);
     }
     
     private double NomalizeMetersPerSeconds(double mps){
-        double RPM = speedEncoder.getVelocity();
+        double RPM = neoSpeedEncoder.getVelocity();
         return ((RPM / 60) / 6.75) * 0.285;
     }
     
@@ -102,15 +108,19 @@ public class SwerveModule {
         return Rotation2d.fromDegrees(angle);
     }
 
+    public double getNeoAngle(){
+        return neoTurnEncoder.getPosition();
+    }
+
     public double getDoubleAngle(){
-        return turnEncoder.getPosition().getValueAsDouble() - encoderOffset;
+        return turnEncoder.getPosition().getValueAsDouble();
     }
     
     private double lastPosition = 0;
     private double lastTime = 0;
     
     public double getSpeedMetersPerSeconds(){
-        double currentPosition = speedEncoder.getPosition();
+        double currentPosition = neoSpeedEncoder.getPosition();
         double currentTime = Timer.getFPGATimestamp();
 
         double deltaPosition = currentPosition - lastPosition;
